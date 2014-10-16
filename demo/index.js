@@ -28,37 +28,21 @@ function render(gl, width, height, dt) {
     mat4.ortho(ortho, 0, width, height, 0, 0, 1)
     shader.uniforms.projection = ortho
 
-
     batch.premultiplied = true
     batch.bind(shader)
 
-    batch.texture = tex2
+    batch.push({
+        position: [0, 0],
+        shape: [128, 128],
+        texture: tex2
+    })
 
-    batch.reset()
-    batch.color = [1, 1, 1, 0.5]
-    batch.position = [0, 0]
-    batch.shape = [128, 128]
-    batch.push()
-
-
-    batch.reset()
-    batch.position = [50, 50]
-    batch.texture = tex
-    batch.shape = [228, 128]
-    batch.texcoord = [0, 0, 0.5, 0.5]
-    batch.push()
-
-    // batch.push({
-    //     position: [00, 00],
-    //     texture: tex2
-    // })
-
-    // batch.push({
-    //     position: [100, 100],
-    //     shape: [128, 128],
-    //     color: [1, 1, 1, 0.5],
-    //     texture: tex
-    // })
+    batch.push({
+        position: [100, 100],
+        shape: [128, 128],
+        color: [1, 1, 1, 0.5],
+        texture: tex
+    })
 
     batch.unbind()
 }

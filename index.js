@@ -110,10 +110,10 @@ mixes(SpriteBatch, {
     },
 
     reset: function() {
-        this.texcoord = copy4(texcoord, 0, 0, 1, 1)
         this.position = copy2(position, 0, 0)
-        this.shape = copy2(shape, 0, 0)
+        this.texcoord = copy4(texcoord, 0, 0, 1, 1)
         this.color = copy4(color, 1, 1, 1, 1)
+        this.shape = copy2(shape, 0, 0)
         return this
     },
 
@@ -125,12 +125,7 @@ mixes(SpriteBatch, {
             this.position = sprite.position || copy2(position, 0, 0)
             this.texcoord = sprite.texcoord || copy4(texcoord, 0, 0, 1, 1)
             this.color = sprite.color || copy4(color, 1, 1, 1, 1)
-            if (sprite.shape)
-                this.shape = sprite.shape
-            else {
-                var texShape = this.texture && this.texture.shape
-                this.shape = texShape ? copyVec2(shape, texShape) : copy2(shape, 0, 0)
-            }
+            this.shape = sprite.shape || copy2(shape, 0, 0)
         }
 
         if (this.texture !== this._lastTexture) {

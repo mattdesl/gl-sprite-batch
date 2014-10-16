@@ -1,0 +1,54 @@
+{
+  "name": "gl-sprite-batch",
+  "version": "1.0.0",
+  "description": "a high level quad batcher for stackgl",
+  "main": "index.js",
+  "license": "MIT",
+  "author": {
+    "name": "Matt DesLauriers",
+    "email": "dave.des@gmail.com",
+    "url": "https://github.com/mattdesl"
+  },
+  "dependencies": {
+    "baboon-image": "^1.0.0",
+    "gl-buffer": "^2.0.9",
+    "lena": "^1.0.0",
+    "mixes": "^1.0.3",
+    "number-util": "^1.0.3",
+    "premultiplied-rgba": "^1.0.0"
+  },
+  "devDependencies": {
+    "canvas-testbed": "^1.0.2",
+    "gl-basic-shader": "^1.2.2",
+    "gl-mat4": "^1.0.0",
+    "gl-texture2d": "^2.0.7",
+    "tape": "^3.0.0"
+  },
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "sprite",
+    "batch",
+    "gl",
+    "2d",
+    "image",
+    "draw",
+    "texture",
+    "tex",
+    "img",
+    "sprites",
+    "batcher",
+    "spritebatch",
+    "sheet",
+    "spritesheet"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mattdesl/gl-sprite-batch.git"
+  },
+  "homepage": "https://github.com/mattdesl/gl-sprite-batch",
+  "bugs": {
+    "url": "https://github.com/mattdesl/gl-sprite-batch/issues"
+  }
+}

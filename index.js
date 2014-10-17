@@ -1,5 +1,5 @@
 var createBuffer = require('gl-buffer')
-var createVAO = require('gl-vertex-array') //TODO: improve this with gl-vao
+var createVAO = require('gl-aliased-vao') //TODO: improve this with gl-vao
 var colorToFloat = require('./pack-rgba-float')
 var mixes = require('mixes')
 var premult = require('premultiplied-rgba')

@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "baboon-image": "^1.0.0",
+    "gl-aliased-vao": "^1.0.0",
     "gl-buffer": "^2.0.9",
     "lena": "^1.0.0",
     "mixes": "^1.0.3",

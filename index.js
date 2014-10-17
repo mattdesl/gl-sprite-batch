@@ -12,7 +12,8 @@ var position = [0, 0],
     texcoord = [0, 0, 0, 0],
     color = [0, 0, 0, 0]
 
-var tmp4 = [0, 0, 0, 0]
+var tmp4 = [0, 0, 0, 0],
+    rotOrigin = [0, 0]
 
 function SpriteBatch(gl, opt) {
     if (!(this instanceof SpriteBatch))
@@ -23,7 +24,7 @@ function SpriteBatch(gl, opt) {
     opt = opt || {}
 
     this._lastTexture = null
-    this.premultiplied = false
+    this.premultiplied = opt.premultiplied || false
 
     var count = typeof opt.count === 'number' ? opt.count : 500
 
@@ -110,6 +111,8 @@ mixes(SpriteBatch, {
     },
 
     reset: function() {
+        this.rotation = 0
+        this.rotationOrigin = copy2(rotOrigin, 0, 0)
         this.position = copy2(position, 0, 0)
         this.texcoord = copy4(texcoord, 0, 0, 1, 1)
         this.color = copy4(color, 1, 1, 1, 1)
@@ -126,6 +129,8 @@ mixes(SpriteBatch, {
             this.texcoord = sprite.texcoord || copy4(texcoord, 0, 0, 1, 1)
             this.color = sprite.color || copy4(color, 1, 1, 1, 1)
             this.shape = sprite.shape || copy2(shape, 0, 0)
+            this.rotation = sprite.rotation || 0
+            this.rotationOrigin = sprite.rotationOrigin || copy2(rotOrigin, 0, 0)
         }
 
         if (this.texture !== this._lastTexture) {
@@ -141,12 +146,6 @@ mixes(SpriteBatch, {
         var colorRGBA = this.premultiplied ? premult(this.color, tmp4) : this.color
         var c = colorToFloat(colorRGBA)
 
-        //determine new position & texcoords
-        var x1 = this.position[0],
-            x2 = this.position[0] + this.shape[0],
-            y1 = this.position[1],
-            y2 = this.position[1] + this.shape[1]
-
         var u1 = this.texcoord[0],
             v1 = this.texcoord[1],
             u2 = this.texcoord[2],
@@ -154,6 +153,56 @@ mixes(SpriteBatch, {
 
         var verts = this.vertices,
             idx = this.idx
+
+        var x = this.position[0],
+            y = this.position[1],
+            width = this.shape[0],
+            height = this.shape[1]
+
+        var x1, y1, x2, y2, x3, y3, x4, y4
+        var rotation = this.rotation
+
+        if (rotation !== 0) {
+            //no scaling for now.
+            var scaleX = 1 //width/tex.getWidth()
+            var scaleY = 1 //height/tex.getHeight()
+            
+            var cx = this.rotationOrigin[0]*scaleX
+            var cy = this.rotationOrigin[1]*scaleY
+    
+            var p1x = -cx
+            var p1y = -cy
+            var p2x = width - cx
+            var p2y = -cy
+            var p3x = width - cx
+            var p3y = height - cy
+            var p4x = -cx
+            var p4y = height - cy
+    
+            var cos = Math.cos(rotation)
+            var sin = Math.sin(rotation)
+            
+            x1 = x + (cos * p1x - sin * p1y) + cx // TOP LEFT
+            y1 = y + (sin * p1x + cos * p1y) + cy
+            x2 = x + (cos * p2x - sin * p2y) + cx // TOP RIGHT
+            y2 = y + (sin * p2x + cos * p2y) + cy
+            x3 = x + (cos * p3x - sin * p3y) + cx // BOTTOM RIGHT
+            y3 = y + (sin * p3x + cos * p3y) + cy
+            x4 = x + (cos * p4x - sin * p4y) + cx // BOTTOM LEFT
+            y4 = y + (sin * p4x + cos * p4y) + cy
+        } else {
+            x1 = x
+            y1 = y
+            
+            x2 = x+width
+            y2 = y
+            
+            x3 = x+width
+            y3 = y+height
+            
+            x4 = x
+            y4 = y+height
+        }
 
         //xy
         verts[idx++] = x1
@@ -166,7 +215,7 @@ mixes(SpriteBatch, {
 
         //xy
         verts[idx++] = x2
-        verts[idx++] = y1
+        verts[idx++] = y2
         //uv
         verts[idx++] = u2
         verts[idx++] = v1
@@ -174,8 +223,8 @@ mixes(SpriteBatch, {
         verts[idx++] = c
 
         //xy
-        verts[idx++] = x2
-        verts[idx++] = y2
+        verts[idx++] = x3
+        verts[idx++] = y3
         //uv
         verts[idx++] = u2
         verts[idx++] = v2
@@ -183,8 +232,8 @@ mixes(SpriteBatch, {
         verts[idx++] = c
 
         //xy
-        verts[idx++] = x1
-        verts[idx++] = y2
+        verts[idx++] = x4
+        verts[idx++] = y4
         //uv
         verts[idx++] = u1
         verts[idx++] = v2

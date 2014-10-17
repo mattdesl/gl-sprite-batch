@@ -10,16 +10,16 @@
     "url": "https://github.com/mattdesl"
   },
   "dependencies": {
-    "baboon-image": "^1.0.0",
     "gl-aliased-vao": "^1.0.0",
     "gl-buffer": "^2.0.9",
-    "lena": "^1.0.0",
     "mixes": "^1.0.3",
     "number-util": "^1.0.3",
     "premultiplied-rgba": "^1.0.0"
   },
   "devDependencies": {
     "canvas-testbed": "^1.0.2",
+    "lena": "^1.0.0",
+    "baboon-image": "^1.0.0",
     "gl-basic-shader": "^1.2.2",
     "gl-mat4": "^1.0.0",
     "gl-texture2d": "^2.0.7",

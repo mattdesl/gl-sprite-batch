@@ -1,6 +1,6 @@
 {
   "name": "gl-sprite-batch",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "a high level quad batcher for stackgl",
   "main": "index.js",
   "license": "MIT",

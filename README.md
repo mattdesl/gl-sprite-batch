@@ -85,7 +85,7 @@ Pushes the current vertex attributes onto the stack for rendering. If `sprite` i
 
 #### `batch.premultiplied`
 
-A boolean, default `false`, that described whether to alpha premultiply the current color before pushing the sprite onto the stack.
+A boolean, default `false`, that described whether to alpha premultiply the current color while pushing it onto the vertex attribute stack.
 
 #### `batch.count`
 
@@ -94,8 +94,6 @@ A read-only number representing the maximum number of sprites this batch can dra
 #### `batch.dispose()`
 
 Disposes the batch and its buffers/VAO.
-
-
 
 ## License
 

@@ -20,7 +20,7 @@ function render(gl, width, height, dt) {
 
     gl.enable(gl.BLEND)
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
-
+    
     shader.bind()
     shader.uniforms.texture0 = 0
 

@@ -44,6 +44,13 @@ function render(gl, width, height, dt) {
         texture: tex
     })
 
+    batch.push({
+        texture: null,
+        position: [100, 100],
+        shape: [63, 63],
+        color: [1, 0, 0, 1.0]
+    })
+
     batch.unbind()
 }
 

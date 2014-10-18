@@ -31,15 +31,17 @@ Attributes carry over to subsequent calls to `push()` unless they are changed.
 
 If the `texture` has changed from the last `push()`, the batch will be flushed. The batch will also avoid overflow, flushing when its capacity is reached. This means each sprite can have different textures; although generally you should use sprite sheets to reduce draw calls. This also means that draw calls may be issued at any point between bind() and unbind(). 
 
+If `texture` is null, it will be assigned to an opaque white texture. This allows for tinted and filled rectangles to be drawn with the same shader and batcher. 
+
 #### shorthand
 
-For convenience, and for scene graphs that operate on "sprite" objects, you can pass the object to the `push()` method. Note that if `texture` isn't specified, it will use the previous state. 
+For convenience, and for scene graphs that operate on "sprite" objects, you can pass the object to the `push()` method. For undefined fields, they will be set to their default (initial) state. The texture will also default here to the white 1x1 texture, for tinted sprites. 
 
 ```js
 batch.bind(shader)
 
 batch.push({
-    texture: tex,           //defaults to last state
+    texture: tex,           //defaults to opaque white texture
     color: [1, 0, 0, 1],    //defaults to [1, 1, 1, 1]
     texcoord: [0, 0, 1, 1], //defaults to [0, 0, 1, 1]
     shape: [25, 25],        //defaults to [0, 0]
@@ -73,10 +75,10 @@ Draws any remaining sprites to the screen and unbinds the vertex array.
 Resets the vertex attributes to their initial state:
 
 ```js
-texcoord = [0, 0, 1, 1]
-color = [1, 1, 1, 1]
-shape = [0, 0]
-position = [0, 0]
+batch.texcoord = [0, 0, 1, 1]
+batch.color = [1, 1, 1, 1]
+batch.shape = [0, 0]
+batch.position = [0, 0]
 ```
 
 #### `batch.push([sprite])`
@@ -90,6 +92,17 @@ A boolean, default `false`, that described whether to alpha premultiply the curr
 #### `batch.count`
 
 A read-only number representing the maximum number of sprites this batch can draw at once. 
+
+#### `batch.texture`
+
+A getter/setter for the batch's texture. If set to `null`, it will default to a [white 1x1 texture](https://www.npmjs.org/package/gl-white-texture).
+
+#### `batch.texcoord` (vec4)
+#### `batch.color` (vec4)
+#### `batch.shape` (vec2)
+#### `batch.position` (vec2)
+
+Arrays for the current vertex attributes. These will not change unless a call to `push()` includes a `sprite` parameter.
 
 #### `batch.dispose()`
 

@@ -3,6 +3,7 @@ var createVAO = require('gl-aliased-vao') //TODO: improve this with gl-vao
 var colorToFloat = require('./pack-rgba-float')
 var mixes = require('mixes')
 var premult = require('premultiplied-rgba')
+var WhiteTex = require('gl-white-texture')
 
 var vertNumFloats = 5
 
@@ -41,9 +42,13 @@ function SpriteBatch(gl, opt) {
     this._count = count
     this.idx = 0
 
-    //default attributes
-    this.reset()
+    //white texture is akin to "no texture" (without switching shaders)
+    this._defaultTexture = WhiteTex(gl)
+    this._texture = this._defaultTexture
     this.texture = null
+
+    //set default attributes
+    this.reset()
 
     //vertex data
     this.vertices = new Float32Array(numVerts)
@@ -93,6 +98,16 @@ mixes(SpriteBatch, {
         }
     },
 
+    texture: {
+        get: function() {
+            return this._texture
+        },
+
+        set: function(tex) {
+            this._texture = tex || this._defaultTexture
+        }
+    },
+
     dispose: function() {
         this.vertexBuffer.dispose()
         this.indexBuffer.dispose()
@@ -123,8 +138,7 @@ mixes(SpriteBatch, {
     push: function(sprite) {
         //if we are defining attributes on the fly
         if (sprite) {
-            if (sprite.texture)
-                this.texture = sprite.texture
+            this.texture = sprite.texture
             this.position = sprite.position || copy2(position, 0, 0)
             this.texcoord = sprite.texcoord || copy4(texcoord, 0, 0, 1, 1)
             this.color = sprite.color || copy4(color, 1, 1, 1, 1)

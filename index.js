@@ -1,11 +1,9 @@
-var createBuffer = require('gl-buffer')
-var createVAO = require('gl-aliased-vao') //TODO: improve this with gl-vao
 var colorToFloat = require('./pack-rgba-float')
 var mixes = require('mixes')
 var premult = require('premultiplied-rgba')
 var WhiteTex = require('gl-white-texture')
 
-var vertNumFloats = 5
+var vertNumFloats = require('./common').floatsPerVertex
 
 //Temporary arrays to avoid GC thrashing
 var position = [0, 0],
@@ -22,83 +20,38 @@ function SpriteBatch(gl, opt) {
         return new SpriteBatch(gl, opt)
     if (!gl)
         throw new Error("must specify gl context")
-
+    this.gl = gl
     opt = opt || {}
-
-    this._lastTexture = null
-    this.premultiplied = opt.premultiplied || false
-
-    var count = typeof opt.count === 'number' ? opt.count : 500
-
-    // 65535 is max index, so 65535 / 6 = 10922.
-    if (count > 10922)
-        throw new Error("Can't have more than 10922 quads per batch: " + count)
-
-    //the total number of floats in our batch
-    var numVerts = count * 4 * vertNumFloats
-
-    //the total number of indices in our batch
-    var numIndices = count * 6
-
-    this._count = count
+    
+    this._bound = false
     this.idx = 0
 
-    //null = identity
+    //no transform means identity
     this.transform = null
 
     //white texture is akin to "no texture" (without switching shaders)
     this._defaultTexture = WhiteTex(gl)
+    this._lastTexture = this._defaultTexture
     this._texture = this._defaultTexture
     this.texture = null
 
+    this.mode = typeof opt.mode === 'number' ? opt.mode : gl.TRIANGLES
+    this.premultiplied = opt.premultiplied || false
+
+    this.create(opt)
+
     //set default attributes
     this.reset()
-
-    //vertex data
-    this.vertices = new Float32Array(numVerts)
-    //index data
-    this.indices = new Uint16Array(numIndices)
-
-    for (var i = 0, j = 0; i < numIndices; i += 6, j += 4) {
-        this.indices[i + 0] = j + 0
-        this.indices[i + 1] = j + 1
-        this.indices[i + 2] = j + 2
-        this.indices[i + 3] = j + 0
-        this.indices[i + 4] = j + 2
-        this.indices[i + 5] = j + 3
-    }
-
-    this.vertexBuffer = createBuffer(gl, this.vertices, gl.ARRAY_BUFFER, gl.DYNAMIC_DRAW)
-    this.indexBuffer = createBuffer(gl, this.indices, gl.ELEMENT_ARRAY_BUFFER, gl.STATIC_DRAW)
-
-    var stride = 5 * 4
-    this.vao = createVAO(gl, [{ //position XY
-        name: 'position',
-        buffer: this.vertexBuffer,
-        size: 2,
-        stride: stride
-    }, { //texcoord UV
-        name: 'texcoord0',
-        buffer: this.vertexBuffer,
-        size: 2,
-        offset: 2 * 4,
-        stride: stride
-    }, { //color (packed) C
-        name: 'color',
-        buffer: this.vertexBuffer,
-        size: 4,
-        stride: stride,
-        offset: 4 * 4,
-        type: gl.UNSIGNED_BYTE,
-        normalized: true
-    }], this.indexBuffer)
 }
+
+//mix in create() and ensureCapacity() functions
+mixes(SpriteBatch, require('./common').mixins)
 
 mixes(SpriteBatch, {
 
-    count: {
+    capacity: {
         get: function() {
-            return this._count
+            return this._capacity
         }
     },
 
@@ -113,20 +66,27 @@ mixes(SpriteBatch, {
     },
 
     dispose: function() {
-        this.vertexBuffer.dispose()
-        this.indexBuffer.dispose()
-        this.vao.dispose()
+        if (this.vertexBuffer)
+            this.vertexBuffer.dispose()
+        if (this.indexBuffer)
+            this.indexBuffer.dispose()
+        if (this.vao)
+            this.vao.dispose()
+    },
+
+    clear: function() {
+        this.idx = 0
+        return this
     },
 
     bind: function(shader) {
-        this.idx = 0
         this.vao.bind(shader)
+        this._bound = true
     },
 
     unbind: function() {
-        if (this.idx > 0)
-            this.flush()
         this.vao.unbind()
+        this._bound = false
     },
 
     reset: function() {
@@ -149,10 +109,15 @@ mixes(SpriteBatch, {
 
         if (this.texture !== this._lastTexture) {
             //new texture, flush previous data
-            this.flush()
+            if (this._bound)
+                this.flush()
             this._lastTexture = this.texture
         } else if (this.idx === this.vertices.length) {
-            //reached our max, flush data before continuing
+            //if we AREN'T bound, we need to stop pushing vertex data!
+            if (!this._bound)
+                return this
+
+            //if we ARE bound, we can flush the batch and continue drawing
             this.flush()
         }
 
@@ -201,21 +166,34 @@ mixes(SpriteBatch, {
     },
 
     flush: function() {
-        if (this.idx === 0)
+        this.draw()
+        this.idx = 0
+        return this
+    },
+
+    draw: function() {
+        //If we've reached a new texture or capacity
+        //while not bound, then we will just clear the batch
+        //to zero and draw nothing
+        if (this.idx === 0 || !this._bound)
             return this
+
+
+
+        var gl = this.gl
+
         var view = this.vertices.subarray(0, this.idx)
         this.vertexBuffer.update(view, 0)
 
         if (this._lastTexture)
             this._lastTexture.bind()
+        this._lastTexture = this.texture
 
         var sprites = (this.idx / (vertNumFloats * 4))
         if (sprites > 0)
-            this.vao.draw(gl.TRIANGLES, sprites * 6, 0)
-
-        this.idx = 0
+            this.vao.draw(this.mode, sprites * 6, 0)
         return this
-    }
+    },
 })
 
 module.exports = SpriteBatch

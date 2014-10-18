@@ -4,7 +4,92 @@
 
 This is a high level 2D sprite (i.e. textured quad) batcher, ideal for optimized rendering of text glyphs, particles, sprites, rectangles/lines, icons, etc. 
 
-Pushing attributes onto the stack may trigger a draw call, if we've reached the capacity of the batch.
+Each sprite is an indexed quad with its own set of attributes:
+
+- `color` (vec4) - the RGBA color for a sprite
+- `position` (vec2) - the x, y position
+- `texcoord` (vec2) the UV texcoords for this sprite
+- `shape` (vec2) - the width and height of a sprite
+- `texture` (gl-texture2d) - a texture or sprite sheet
+
+Note that `shape` and `texture` are not actual *vertex* attributes although they may affect each sprite.
+
+It can be used for [dynamic](#dynamic) or [static](#static) rendering.
+
+## dynamic
+
+Dynamic rendering is the easiest and most convenient, and is ideal for particle systems and sprite-based games. In this case, the sprites are pushed to the batch *after it has been bound.* This means that it can flush to the GPU when it reaches the max capacity, or when a new texture is being drawn.
+
+To minimize flushes, you should always aim to use texture atlases. You can also provide a `dynamic` hint to the constructor, which allows the WebGL buffers to be optimized for dynamic rendering. 
+
+```js
+var Batch = require('gl-sprite-batch')
+
+//hint that we're using dynamic buffers
+var batch = Batch({ dynamic: true })
+
+function render(shader) {
+    //bind the batch with your desired shader
+    batch.bind(shader)
+
+    //clear the batch to zero sprites
+    batch.clear()
+
+    //draw a variety of sprites/textures...
+    batch.push({
+        texture: myTex,
+        position: [0, 0],
+        shape: [128, 128]
+    })
+    batch.push({
+        texture: otherTex,
+        position: [0, 0],
+        shape: [64, 64]
+    })
+    
+    //now flush any remaining sprites and unbind the VAO
+    batch.draw()
+    batch.unbind()
+}
+```
+
+## static
+
+A static batch is only suitable for a single texture (or sprite sheet) and a fixed capacity of sprites. This allows you to push a lot of static sprites (like text glyphs) and leave them in a static buffer on the GPU.
+
+For static usage, the sprites should be pushed before calling `bind()`. If you reach the max capacity, it will stop pushing new sprites to the batch. The batch will draw with whatever texture was last set (which means you can swap textures without updating any buffers). 
+
+```js
+var Batch = require('gl-sprite-batch')
+
+//draws max 100 sprites
+var batch = Batch({ capacity: 100 })
+
+//push all our sprites
+sprites.forEach(function(s) {
+    batch.push(s)
+})
+
+//draw the static batch
+function render(shader) {
+    batch.bind(shader)
+    batch.draw()
+    batch.unbind()
+}
+```
+
+## default texture
+
+If you set the texture to `null`, it will reset to a [2x2 white texture](https://www.npmjs.org/package/gl-white-texture). This is useful for drawing filled primitives like rectangles and lines.
+
+## attributes
+
+
+
+## transform
+
+Often games and UIs will need per-sprite transformations, like rotation, scaling and positioning. 
+
 
 The generic "long-winded" approach:
 
@@ -37,19 +122,7 @@ If `texture` is null, it will be assigned to an opaque white texture. This allow
 
 For convenience, and for scene graphs that operate on "sprite" objects, you can pass the object to the `push()` method. For undefined fields, they will be set to their default (initial) state. The texture will also default here to the white 1x1 texture, for tinted sprites. 
 
-```js
-batch.bind(shader)
 
-batch.push({
-    texture: tex,           //defaults to opaque white texture
-    color: [1, 0, 0, 1],    //defaults to [1, 1, 1, 1]
-    texcoord: [0, 0, 1, 1], //defaults to [0, 0, 1, 1]
-    shape: [25, 25],        //defaults to [0, 0]
-    position: [0, 0]        //defaults to [0, 0]
-})
-
-batch.unbind()
-```
 
 ## Usage
 

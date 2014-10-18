@@ -14,7 +14,8 @@ var position = [0, 0],
     color = [0, 0, 0, 0]
 
 var tmp4 = [0, 0, 0, 0],
-    rotOrigin = [0, 0]
+    rotOrigin = [0, 0],
+    tmp2 = [0, 0]
 
 function SpriteBatch(gl, opt) {
     if (!(this instanceof SpriteBatch))
@@ -41,6 +42,9 @@ function SpriteBatch(gl, opt) {
 
     this._count = count
     this.idx = 0
+
+    //null = identity
+    this.transform = null
 
     //white texture is akin to "no texture" (without switching shaders)
     this._defaultTexture = WhiteTex(gl)
@@ -165,8 +169,6 @@ mixes(SpriteBatch, {
             u2 = this.texcoord[2],
             v2 = this.texcoord[3]
 
-        var verts = this.vertices,
-            idx = this.idx
 
         var x = this.position[0],
             y = this.position[1],
@@ -207,15 +209,31 @@ mixes(SpriteBatch, {
         } else {
             x1 = x
             y1 = y
-            
             x2 = x+width
             y2 = y
-            
             x3 = x+width
             y3 = y+height
-            
             x4 = x
             y4 = y+height
+        }
+
+        this._vert(x1, y1, u1, v1, c)
+        this._vert(x2, y2, u2, v1, c)
+        this._vert(x3, y3, u2, v2, c)
+        this._vert(x4, y4, u1, v2, c)
+        
+        return this
+    },
+
+    _vert: function(x1, y1, u1, v1, c) {
+        var idx = this.idx,
+            verts = this.vertices,
+            transform = this.transform
+
+        if (transform) {
+            var x = x1, y = y1
+            x1 = transform[0] * x + transform[4] * y + transform[12]
+            y1 = transform[1] * x + transform[5] * y + transform[13]
         }
 
         //xy
@@ -226,36 +244,7 @@ mixes(SpriteBatch, {
         verts[idx++] = v1
         //color
         verts[idx++] = c
-
-        //xy
-        verts[idx++] = x2
-        verts[idx++] = y2
-        //uv
-        verts[idx++] = u2
-        verts[idx++] = v1
-        //color
-        verts[idx++] = c
-
-        //xy
-        verts[idx++] = x3
-        verts[idx++] = y3
-        //uv
-        verts[idx++] = u2
-        verts[idx++] = v2
-        //color
-        verts[idx++] = c
-
-        //xy
-        verts[idx++] = x4
-        verts[idx++] = y4
-        //uv
-        verts[idx++] = u1
-        verts[idx++] = v2
-        //color
-        verts[idx++] = c
-
         this.idx = idx
-        return this
     },
 
     flush: function() {
@@ -278,7 +267,7 @@ mixes(SpriteBatch, {
 
 module.exports = SpriteBatch
 
-//TODO: use gl-matrix for these...
+//TODO: will use modular gl-matrix for these...
 function copy2(out, x, y) {
     out[0] = x
     out[1] = y
@@ -295,4 +284,12 @@ function copy4(out, x, y, z, w) {
 
 function copyVec2(out, vec) {
     return copy2(out, vec[0], vec[1])
+}
+
+function transformMat4(out, a, m) {
+    var x = a[0], 
+        y = a[1]
+    out[0] = m[0] * x + m[4] * y + m[12]
+    out[1] = m[1] * x + m[5] * y + m[13]
+    return out
 }

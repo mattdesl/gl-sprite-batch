@@ -108,6 +108,15 @@ Arrays for the current vertex attributes. These will not change unless a call to
 
 Disposes the batch and its buffers/VAO.
 
+#### `batch.transform`
+
+A 4x4 matrix to transform each 2D point by. See below.
+
+
+## CPU Transformations
+
+Most sprite-based games will want a fast per-sprite transformation (i.e. for rotation)
+
 ## License
 
 MIT, see [LICENSE.md](http://github.com/mattdesl/gl-sprite-batch/blob/master/LICENSE.md) for details.

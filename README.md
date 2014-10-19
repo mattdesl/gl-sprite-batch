@@ -205,18 +205,22 @@ A read-only number representing the maximum number of sprites this batch can dra
 
 #### `batch.texture`
 
-A getter/setter for the batch's texture. If set to `null`, it will default to a [white 1x1 texture](https://www.npmjs.org/package/gl-white-texture).
+A getter/setter for the batch's texture. If set to `null`, it will default to a [white 2x2 texture](https://www.npmjs.org/package/gl-white-texture).
 
-#### `batch.texcoord` (vec4)
-#### `batch.color` (vec4)
-#### `batch.shape` (vec2)
-#### `batch.position` (vec2)
+#### `batch.texcoord` 
+#### `batch.color` 
+#### `batch.shape` 
+#### `batch.position`
 
 Arrays for the current vertex attributes. These will not change unless a call to `push()` includes a `sprite` parameter.
 
 #### `batch.transform`
 
 A 4x4 matrix array to transform each 2D point by. Default null (i.e. no transformation).
+
+#### `batch.mode`
+
+The primitive drawing mode set during initialization; default `gl.TRIANGLES`.
 
 ## License
 

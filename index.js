@@ -41,7 +41,7 @@ function SpriteBatch(gl, opt) {
     this.create(opt)
 
     //set default attributes
-    this.reset()
+    this.defaults()
 }
 
 //mix in create() and ensureCapacity() functions
@@ -89,7 +89,7 @@ mixes(SpriteBatch, {
         this._bound = false
     },
 
-    reset: function() {
+    defaults: function() {
         this.position = copy2(position, 0, 0)
         this.texcoord = copy4(texcoord, 0, 0, 1, 1)
         this.color = copy4(color, 1, 1, 1, 1)
@@ -167,8 +167,7 @@ mixes(SpriteBatch, {
 
     flush: function() {
         this.draw()
-        this.idx = 0
-        return this
+        return this.clear()
     },
 
     draw: function() {
@@ -177,8 +176,6 @@ mixes(SpriteBatch, {
         //to zero and draw nothing
         if (this.idx === 0 || !this._bound)
             return this
-
-
 
         var gl = this.gl
 

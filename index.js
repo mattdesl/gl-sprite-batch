@@ -80,6 +80,7 @@ mixes(SpriteBatch, {
     },
 
     bind: function(shader) {
+        shader.bind()
         this.vao.bind(shader)
         this._bound = true
     },

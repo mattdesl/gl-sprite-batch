@@ -158,7 +158,7 @@ Disposes of the current buffers and re-builds them with the specified options:
 
 #### `batch.bind(shader)`
 
-Binds the vertex array with the specified shader. If sprites are pushed after this, they may be flushed to the GPU (i.e. if the texture changes or the capacity is reached). 
+Binds the vertex array and specified shader. If sprites are pushed after this, they may be flushed to the GPU (i.e. if the texture changes or the capacity is reached). 
 
 #### `batch.draw()`
 

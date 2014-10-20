@@ -182,7 +182,7 @@ mixes(SpriteBatch, {
             return this
 
         var gl = this.gl
-
+        
         if (this._dirty) {
             var view = this.vertices.subarray(0, this.idx)
             this.vertexBuffer.update(view, 0)

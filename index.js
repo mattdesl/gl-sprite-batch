@@ -38,6 +38,7 @@ function SpriteBatch(gl, opt) {
     this.mode = typeof opt.mode === 'number' ? opt.mode : gl.TRIANGLES
     this.premultiplied = opt.premultiplied || false
 
+    this._dirty = true
     this.create(opt)
 
     //set default attributes
@@ -122,6 +123,8 @@ mixes(SpriteBatch, {
             this.flush()
         }
 
+        this._dirty = true
+
         //get RGBA components and pack into a single float
         var colorRGBA = this.premultiplied ? premult(this.color, tmp4) : this.color
         var c = colorToFloat(colorRGBA)
@@ -180,8 +183,11 @@ mixes(SpriteBatch, {
 
         var gl = this.gl
 
-        var view = this.vertices.subarray(0, this.idx)
-        this.vertexBuffer.update(view, 0)
+        if (this._dirty) {
+            var view = this.vertices.subarray(0, this.idx)
+            this.vertexBuffer.update(view, 0)
+            this._dirty = false
+        }
 
         if (this._lastTexture)
             this._lastTexture.bind()

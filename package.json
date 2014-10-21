@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "gl-aliased-vao": "^1.0.0",
+    "gl-buffer": "^2.0.9",
     "gl-white-texture": "^1.0.0",
     "mixes": "^1.0.3",
     "number-util": "^1.0.3",

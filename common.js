@@ -42,6 +42,7 @@ module.exports.mixins = {
         this.vertices = new Float32Array(numVerts)
         this.indices = createIndices(capacity)
 
+        var gl = this.gl
         var usage = opt.dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW
         this.vertexBuffer = createBuffer(gl, this.vertices, gl.ARRAY_BUFFER, usage)
         this.indexBuffer = createBuffer(gl, this.indices, gl.ELEMENT_ARRAY_BUFFER, gl.STATIC_DRAW)

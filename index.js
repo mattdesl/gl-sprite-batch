@@ -31,6 +31,7 @@ function SpriteBatch(gl, opt) {
 
     //white texture is akin to "no texture" (without switching shaders)
     this._defaultTexture = opt.defaultTexture || WhiteTex(gl)
+    this._ownsDefault = !opt.defaultTexture
     this._lastTexture = this._defaultTexture
     this._texture = this._defaultTexture
     this.texture = null
@@ -73,6 +74,8 @@ mixes(SpriteBatch, {
             this.indexBuffer.dispose()
         if (this.vao)
             this.vao.dispose()
+        if (this._ownsDefault)
+            this._defaultTexture.dispose()
     },
 
     clear: function() {

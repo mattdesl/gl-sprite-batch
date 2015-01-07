@@ -30,7 +30,7 @@ function SpriteBatch(gl, opt) {
     this.transform = null
 
     //white texture is akin to "no texture" (without switching shaders)
-    this._defaultTexture = WhiteTex(gl)
+    this._defaultTexture = opt.defaultTexture || WhiteTex(gl)
     this._lastTexture = this._defaultTexture
     this._texture = this._defaultTexture
     this.texture = null

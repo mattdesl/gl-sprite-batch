@@ -81,7 +81,7 @@ The default batch capacity is 100, which you may want to alter for your needs.
 var Batch = require('gl-sprite-batch')
 
 //hint that we're using dynamic buffers
-var batch = Batch({ dynamic: true })
+var batch = Batch(gl, { dynamic: true })
 
 function render(shader) {
     //bind the batch with your desired shader
@@ -120,7 +120,7 @@ Usually this is only needed if you find that dynamic batching is leading to bott
 var Batch = require('gl-sprite-batch')
 
 //draws max 100 sprites
-var batch = Batch({ capacity: 100 })
+var batch = Batch(gl, { capacity: 100 })
 
 //push all our sprites
 sprites.forEach(function(s) {
@@ -139,9 +139,10 @@ function render(shader) {
 
 [![NPM](https://nodei.co/npm/gl-sprite-batch.png)](https://nodei.co/npm/gl-sprite-batch/)
 
-#### `batch = SpriteBatch([opts])`
+#### `batch = SpriteBatch(gl, [opts])`
 
-Creates a new sprite batch with the given options.
+Creates a new sprite batch using the OpenGL context `gl`, with the given
+options.
 
 - `capacity` the max # of sprites that will be issued in a single draw call, default 100
 - `dynamic` a hint for buffer usage; default false
